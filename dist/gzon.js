@@ -6823,7 +6823,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
    * @alias GZON
    * @description A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC
    * @author JimZeeKing
-   * @version 0.9.0
+   * @version 0.9.1
    * @todo Allow user to specify single key not to be touched or used during compression
    */
 
@@ -6843,6 +6843,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
       obj.GZONKeys = _replacedKeys;
       var objStr = JSON.stringify(obj);
+      delete obj.GZONKeys;
 
       for (var index = 0; index < _replacedKeys.length; index++) {
         var key = _replacedKeys[index][0];
@@ -6859,7 +6860,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
      * @type {Function}
      * @description Recreates an object from a previously compressed one
      * @param {String} The Base64 string of the compressed JSON data
-     * @returns {Objct} The original object use at compression time
+     * @returns {Object} The original object use at compression time
      */
 
 

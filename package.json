@@ -2,6 +2,10 @@
   "name": "gzon",
   "version": "0.9.0",
   "description": "A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JimZeeKing/GZON.git"
+  },
   "main": "gzon",
   "scripts": {
     "bundle": "browserify ./src/main.js -o ./dist/gzon.js -t [ babelify --presets [ @babel/preset-env] ]",
@@ -15,7 +19,11 @@
     "@babel/preset-env": "^7.2.0",
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
+    "karma-chrome-launcher": "^2.2.0",
     "pako": "^1.0.7",
     "uglifyify": "^5.0.1"
+  },
+  "dependencies": {
+    "jsdoc": "^3.5.5"
   }
 }

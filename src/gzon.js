@@ -34,7 +34,7 @@ import pako from 'pako';
      * @alias GZON
      * @description A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC
      * @author JimZeeKing
-     * @version 0.9.0
+     * @version 0.9.1
      * @todo Allow user to specify single key not to be touched or used during compression
      */
     function GZON() {
@@ -53,6 +53,7 @@ import pako from 'pako';
             _grabKeys(obj);
             obj.GZONKeys = _replacedKeys;
             let objStr = JSON.stringify(obj);
+            delete obj.GZONKeys;
             for (let index = 0; index < _replacedKeys.length; index++) {
                 let key = _replacedKeys[index][0];
                 let newKey = _replacedKeys[index][1];
