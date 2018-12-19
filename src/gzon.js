@@ -1,4 +1,3 @@
-import pako from 'pako';
 /**
  * 
  * Copyright (C) 2018 by JimZeeKing
@@ -24,6 +23,9 @@ import pako from 'pako';
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
+
+import pako from 'pako';
+
 (function () {
     'use strict';
 
@@ -66,7 +68,7 @@ import pako from 'pako';
          * @type {Function}
          * @description Recreates an object from a previously compressed one
          * @param {String} The Base64 string of the compressed JSON data
-         * @returns {Objct} The original object use at compression time
+         * @returns {Object} The original object use at compression time
          */
         api.decompress = (b64gzippedJSON) => {
             let gzippedJSON = window.atob(b64gzippedJSON);
@@ -92,22 +94,25 @@ import pako from 'pako';
          * @type {Array}
          */
         let _keys = [];
+
         /**
          * @private
          * @type {Array}
          */
         let _values = [];
+
         /**
          * @private
          * @type {Array}
          */
         let _objs = [];
+
         /**
          * @private
          * @type {String}
          */
-        //const _replacementsKeys = 'a';
         const _replacementsKeys = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-!@#$%?&*()+';
+
         /**
          * @private
          * @type {Array}
@@ -117,23 +122,22 @@ import pako from 'pako';
         /**
          * @private
          * @type {Function}
-         * @description Grab and store all keys to be replaced in the object. This call will be recusrsive if needed too.
+         * @description Grab and store all keys to be replaced in the input object. This call will be recusrsive if needed too.
+         * @param {Object} object The input object to compress
          * @returns {undefined} 
          */
         let _grabKeys = (object) => {
             let entries = Object.entries(object);
             for (let index = 0; index < entries.length; index++) {
-                if (_keys.indexOf(entries[index][0]) == -1 && entries[index][0] != "GZONKeys") {
-
-                    if (_keys.length >= _replacementsKeys.length) {
-                        // console.log(Math.ceil(_keys.length/ _replacementsKeys.length), _replacedKeys.length);
-                    }
-                    _keys.push(entries[index][0]);
-                    let tmp = [entries[index][0], _addReplacementKeys(Math.ceil(_keys.length / _replacementsKeys.length))];
-
+                let key = entries[index][0];
+                let value = entries[index][1];
+                if (_keys.indexOf(key) == -1) {
+                    _keys.push(key);
+                    let tmp = [key, _addReplacementKeys(Math.ceil(_keys.length / _replacementsKeys.length))];
                     _replacedKeys.push(tmp);
-                    if (typeof entries[index][1] == "object" && !Array.isArray(entries[index][1])) {
-                        _grabKeys(entries[index][1]);
+                    if (typeof value == "object" && !Array.isArray(value)) {
+                        //we have an object
+                        _grabKeys(value);
                     } else if (Array.isArray(entries[index][1])) {
                         for (let j = 0; j < entries[index][1].length; j++) {
                             _grabKeys(entries[index][1][j]);
@@ -146,18 +150,20 @@ import pako from 'pako';
         /**
          * @private
          * @type {Function}
-         * @description Escapes actual regExp cahr to be used as a match
+         * @description Escapes actual regExp char to be used as a match
+         * @param {String} str The string to escape
          * @author https://github.com/tcorral/JSONC
          * @returns {String} The escaped string
          */
-        let _escapeRegExp = (text) => {
-            return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+        let _escapeRegExp = (str) => {
+            return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
         }
 
         /**
          * @private
          * @type {Function}
          * @description Add a new key for replacement and make sure that each key will always be unique. Also takes into account the fact that all keys have been used
+         * @param {Number} totalToAdd The number of time this key is used as "one" key. Ex: aa,***,QQQQ
          * @returns {String} The replacement key
          */
         let _addReplacementKeys = (totalToAdd = 1) => {

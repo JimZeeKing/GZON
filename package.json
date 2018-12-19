@@ -5,7 +5,8 @@
   "main": "gzon",
   "scripts": {
     "bundle": "browserify ./src/main.js -o ./dist/gzon.js -t [ babelify --presets [ @babel/preset-env] ]",
-    "bundle-minified": "browserify -g uglifyify ./src/gzon.js -o ./dist/gzon.min.js -t [ babelify --presets [ @babel/preset-env] ]"
+    "bundle-minified": "browserify -g uglifyify ./src/gzon.js -o ./dist/gzon.min.js -t [ babelify --presets [ @babel/preset-env] ]",
+    "deploy": "npm run bundle && npm run bundle-minified"
   },
   "author": "JimZeeKing",
   "license": "MIT",

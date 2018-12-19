@@ -6816,31 +6816,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-/**
- * 
- * Copyright (C) 2018 by JimZeeKing
- * 
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
-
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
-
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
- */
 (function () {
   'use strict';
   /**
@@ -6930,7 +6905,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
      * @private
      * @type {String}
      */
-    //const _replacementsKeys = 'a';
 
     var _replacementsKeys = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-!@#$%?&*()+';
     /**
@@ -6942,7 +6916,8 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     /**
      * @private
      * @type {Function}
-     * @description Grab and store all keys to be replaced in the object. This call will be recusrsive if needed too.
+     * @description Grab and store all keys to be replaced in the input object. This call will be recusrsive if needed too.
+     * @param {Object} object The input object to compress
      * @returns {undefined} 
      */
 
@@ -6950,18 +6925,19 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       var entries = Object.entries(object);
 
       for (var index = 0; index < entries.length; index++) {
-        if (_keys.indexOf(entries[index][0]) == -1 && entries[index][0] != "GZONKeys") {
-          if (_keys.length >= _replacementsKeys.length) {// console.log(Math.ceil(_keys.length/ _replacementsKeys.length), _replacedKeys.length);
-          }
+        var key = entries[index][0];
+        var value = entries[index][1];
 
-          _keys.push(entries[index][0]);
+        if (_keys.indexOf(key) == -1) {
+          _keys.push(key);
 
-          var tmp = [entries[index][0], _addReplacementKeys(Math.ceil(_keys.length / _replacementsKeys.length))];
+          var tmp = [key, _addReplacementKeys(Math.ceil(_keys.length / _replacementsKeys.length))];
 
           _replacedKeys.push(tmp);
 
-          if (_typeof(entries[index][1]) == "object" && !Array.isArray(entries[index][1])) {
-            _grabKeys(entries[index][1]);
+          if (_typeof(value) == "object" && !Array.isArray(value)) {
+            //we have an object
+            _grabKeys(value);
           } else if (Array.isArray(entries[index][1])) {
             for (var j = 0; j < entries[index][1].length; j++) {
               _grabKeys(entries[index][1][j]);
@@ -6975,19 +6951,21 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     /**
      * @private
      * @type {Function}
-     * @description Escapes actual regExp cahr to be used as a match
+     * @description Escapes actual regExp char to be used as a match
+     * @param {String} str The string to escape
      * @author https://github.com/tcorral/JSONC
      * @returns {String} The escaped string
      */
 
 
-    var _escapeRegExp = function _escapeRegExp(text) {
-      return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    var _escapeRegExp = function _escapeRegExp(str) {
+      return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
     };
     /**
      * @private
      * @type {Function}
      * @description Add a new key for replacement and make sure that each key will always be unique. Also takes into account the fact that all keys have been used
+     * @param {Number} totalToAdd The number of time this key is used as "one" key. Ex: aa,***,QQQQ
      * @returns {String} The replacement key
      */
 
