@@ -9,7 +9,7 @@ I had to work with lots and lots of big json objects and wanted to find a way to
 Just use one of the two files in the **dist** folder and you are good to go! You could also `require("GZON")` on the source.
 
 # Example
-See the index.html file to test it live with a demo object
+See the [index.html](https://github.com/JimZeeKing/GZON/blob/master/index.html) file to test it live with a demo object.<br>With the demo there, the initial json data is ~25kb and the compressed result is ~3kb. Those results can vary depending of the input object.
 
 # Build
-Just `npm install` and `npm run bundle` or `npm run bundle-minified` to build the library
+Should you want to update the library, just `npm install` and `npm run bundle` or `npm run bundle-minified` to build the library
