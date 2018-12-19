@@ -4,8 +4,8 @@
   "description": "A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC",
   "main": "gzon",
   "scripts": {
-    "bundle": "browserify ./src/main.js -o ./dist/bundle.js -t [ babelify --presets [ @babel/preset-env] ]",
-    "bundle-minified": "browserify -g uglifyify ./src/main.js -o ./dist/bundle.min.js -t [ babelify --presets [ @babel/preset-env] ]"
+    "bundle": "browserify ./src/main.js -o ./dist/gzon.js -t [ babelify --presets [ @babel/preset-env] ]",
+    "bundle-minified": "browserify -g uglifyify ./src/gzon.js -o ./dist/gzon.min.js -t [ babelify --presets [ @babel/preset-env] ]"
   },
   "author": "JimZeeKing",
   "license": "MIT",
