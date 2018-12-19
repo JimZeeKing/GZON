@@ -10,7 +10,8 @@
   "scripts": {
     "bundle": "browserify ./src/main.js -o ./dist/gzon.js -t [ babelify --presets [ @babel/preset-env] ]",
     "bundle-minified": "browserify -g uglifyify ./src/gzon.js -o ./dist/gzon.min.js -t [ babelify --presets [ @babel/preset-env] ]",
-    "deploy": "npm run bundle && npm run bundle-minified"
+    "deploy": "npm run bundle && npm run bundle-minified",
+    "test": "karma start test/karma.conf.js"
   },
   "author": "JimZeeKing",
   "license": "MIT",
