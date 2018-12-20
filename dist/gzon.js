@@ -6834,7 +6834,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
      * @alias GZON.compress
      * @type {Function}
      * @description Stringify to JSON and compress an object to a final Base64 string
-     * @param {Object} Object to compress
+     * @param {Object} obj Object to compress
      * @returns {String} The final Base64 string of the JSON data
      */
 
@@ -6859,7 +6859,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
      * @alias GZON.decompress
      * @type {Function}
      * @description Recreates an object from a previously compressed one
-     * @param {String} The Base64 string of the compressed JSON data
+     * @param {String} b64gzippedJSON The Base64 string of the compressed JSON data
      * @returns {Object} The original object use at compression time
      */
 

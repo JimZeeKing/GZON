@@ -1,9 +1,9 @@
 var inputSmall = {
     "id": 12321412321421,
     "logs": [
-        { "timestamp": 231421241, "value": "this is a value" },
-        { "timestamp": 423533244, "value": "this is a value 2" },
-        { "timestamp": 655465474, "value": "this is a value 3" }
+        { "timestamp": 231421241, "value": "a" },
+        { "timestamp": 423533244, "value": "bb" },
+        { "timestamp": 655465474, "value": "ccc" }
     ],
     "matches": "/[a-z0-9]/"
 };
@@ -17,12 +17,12 @@ var inputBig = {
     navigator: {
         agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.110 Safari/537.36',
         location: {
-            href: 'http://tim.cgmatane.qc.ca/EventLogger/',
+            href: 'test.com',
             ancestorOrigins: {},
-            origin: 'http://tim.cgmatane.qc.ca',
+            origin: 'test.com',
             protocol: 'http:',
-            host: 'tim.cgmatane.qc.ca',
-            hostname: 'tim.cgmatane.qc.ca',
+            host: 'test.com',
+            hostname: 'test.com',
             port: '',
             pathname: '/EventLogger/',
             search: '',
@@ -1731,23 +1731,38 @@ var inputBig = {
 };
 
 
-describe('Checking compression and decompression', function () {
+describe('Compression', function () {
     var compressed = GZON.compress(inputSmall);
     var compressedBig = GZON.compress(inputBig);
-    it('compression', function () {
-        expect(compressed).toBe("H4sIAAAAAAACA3WOQQrCMBBFr1L+OqV2klTMBVwIujdkEdtgCw0KiYKW3t2kxZ3CMPDfPJg/wULVxKkW66aa4QKlJ7RQxDMgkVgHhdgPoUhji6cdHw4zWyxBXHJOQvy0Cvp6jZSikWL7x+OYDYNLl0rb8r0pd6YCw/58Oh7cK6ROGkOXiIVhGuPtGpC75hAH70K0/p5Iu5C1Yf6Uk7ex7V32HYyZP/6dQ6r2AAAA");
+
+    it('should return a string', function () {
+        expect(compressed).toEqual(jasmine.any(String));
     });
 
+    it('should return a string', function () {
+        expect(compressedBig).toEqual(jasmine.any(String));
+    });
 
-    it('decompression', function () {
+    it('should be efficient with big object', function () {
+        var smallBytes = (JSON.stringify(inputSmall).length / 1024).toFixed(2);
+        var smallCompressedBytes = (compressed.length / 1024).toFixed(2);
+        console.log("Efficiency small object : " + (smallBytes / smallCompressedBytes).toFixed(1) + "X " + ((Number(smallBytes) > Number(smallCompressedBytes)) ? "reduction" : "increase") + " " + (smallBytes + " --> " + smallCompressedBytes));
+        var bigBytes = (JSON.stringify(inputBig).length / 1024).toFixed(2);
+        var bigCompressedBytes = (compressedBig.length / 1024).toFixed(2);
+        console.log("Efficiency big object : " + (bigBytes / bigCompressedBytes).toFixed(1) + "X " + ((Number(bigBytes) > Number(bigCompressedBytes)) ? "reduction" : "increase") + " " + (bigBytes + " --> " + bigCompressedBytes));
+        expect(compressedBig.length).toBeLessThan(JSON.stringify(inputBig).length);
+    });
+});
+
+describe('Decompression', function () {
+    var compressed = GZON.compress(inputSmall);
+    var compressedBig = GZON.compress(inputBig);
+
+    it('should restore object original identity', function () {
         expect(GZON.decompress(compressed)).toEqual(inputSmall);
     });
 
-
-    it('efficiency', function () {
-        var bigBytes = (JSON.stringify(inputBig).length / 1024).toFixed(2);
-        var bigCompressedBytes = (compressedBig.length / 1024).toFixed(2);
-        console.log("Efficiency : " + (bigBytes / bigCompressedBytes).toFixed(1) + "X reduction " + (bigBytes + " --> " + bigCompressedBytes));
-        expect(compressedBig.length).toBeLessThan(JSON.stringify(inputBig).length);
+    it('should restore object original identity', function () {
+        expect(GZON.decompress(compressedBig)).toEqual(inputBig);
     });
 });
