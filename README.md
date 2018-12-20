@@ -2,7 +2,7 @@
 _version 0.9.1_
   
 [![Build Status](https://travis-ci.com/JimZeeKing/GZON.svg?branch=master)](https://travis-ci.com/JimZeeKing/GZON)
-  
+
 A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. This library try to reduce object size by replacing keys with small one. Thus, an object with a lot of different keys that never repeat will be harder to compressed efficiently. **It could event increase the size of the native object**
 
 
@@ -11,6 +11,9 @@ I had to work with lots and lots of big json objects and wanted to find a way to
  
 # Including the file in your project
 Just use one of the two files in the **dist** folder and you are good to go! You could also `require("GZON")` on the source.
+
+# Documentation
+You can read throught this [huge documentation](https://jimzeeking.github.io/GZON/GZON.html) :)
 
 # Example
 See the [index.html](https://github.com/JimZeeKing/GZON/blob/master/index.html) file to test it live with a demo object.<br>With the demo there, the initial json data is ~25kb and the compressed result is ~3kb. Those results can vary depending of the input object.
