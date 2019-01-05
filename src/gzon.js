@@ -139,9 +139,9 @@ import pako from 'pako';
                     if (typeof value == "object" && !Array.isArray(value)) {
                         //we have an object
                         _grabKeys(value);
-                    } else if (Array.isArray(entries[index][1])) {
-                        for (let j = 0; j < entries[index][1].length; j++) {
-                            _grabKeys(entries[index][1][j]);
+                    } else if (Array.isArray(value)) {
+                        for (let j = 0; j < value.length; j++) {
+                            _grabKeys(value[j]);
                         }
                     };
                 }
