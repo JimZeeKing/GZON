@@ -6823,7 +6823,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
    * @alias GZON
    * @description A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC
    * @author JimZeeKing
-   * @version 0.9.1
+   * @version 0.9.5
    * @todo Allow user to specify single key not to be touched or used during compression
    */
 
@@ -6832,13 +6832,18 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     var api = {};
     /**
      * @alias GZON.compress
-     * @type {Function}
+     * @type {function}
      * @description Stringify to JSON and compress an object to a final Base64 string
-     * @param {Object} obj Object to compress
-     * @returns {String} The final Base64 string of the JSON data
+     * @param {(Object|string)} obj Input to compress
+     * @returns {string} The final Base64 string of the JSON data
      */
 
     api.compress = function (obj) {
+      if (typeof obj === "string") {
+        obj = JSON.parse(obj);
+        console.log("string");
+      }
+
       _grabKeys(obj);
 
       obj.GZONKeys = _replacedKeys;
@@ -6857,14 +6862,16 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     };
     /**
      * @alias GZON.decompress
-     * @type {Function}
-     * @description Recreates an object from a previously compressed one
-     * @param {String} b64gzippedJSON The Base64 string of the compressed JSON data
-     * @returns {Object} The original object use at compression time
+     * @type {function}
+     * @description Recreates an object from a previously compressed input
+     * @param {string} b64gzippedJSON The Base64 string of the gzipped JSON data
+     * @param {boolean} [returnJSON = false] Should the returned value be a JSON string or a fully parsed object
+     * @returns {(Object|string)} The original input use at compression time
      */
 
 
     api.decompress = function (b64gzippedJSON) {
+      var returnJSON = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var gzippedJSON = window.atob(b64gzippedJSON);
       var json = String.fromCharCode.apply(String, _pako.default.ungzip(gzippedJSON, {
         level: 9
@@ -6880,7 +6887,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         objStr = objStr.replace(new RegExp('(?:"' + _escapeRegExp(key) + '"):', 'g'), '"' + oldKey + '":');
       }
 
-      return JSON.parse(objStr);
+      return returnJSON ? objStr : JSON.parse(objStr);
     }; //private
 
     /**

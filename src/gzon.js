@@ -34,7 +34,7 @@ import pako from 'pako';
      * @alias GZON
      * @description A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC
      * @author JimZeeKing
-     * @version 0.9.1
+     * @version 0.9.5
      * @todo Allow user to specify single key not to be touched or used during compression
      */
     function GZON() {
@@ -44,12 +44,17 @@ import pako from 'pako';
 
         /**
          * @alias GZON.compress
-         * @type {Function}
+         * @type {function}
          * @description Stringify to JSON and compress an object to a final Base64 string
-         * @param {Object} obj Object to compress
-         * @returns {String} The final Base64 string of the JSON data
+         * @param {(Object|string)} obj Input to compress
+         * @returns {string} The final Base64 string of the JSON data
          */
         api.compress = (obj) => {
+            if (typeof obj === "string") {
+                obj = JSON.parse(obj);
+                console.log("string");
+            }
+
             _grabKeys(obj);
             obj.GZONKeys = _replacedKeys;
             let objStr = JSON.stringify(obj);
@@ -66,12 +71,13 @@ import pako from 'pako';
 
         /**
          * @alias GZON.decompress
-         * @type {Function}
-         * @description Recreates an object from a previously compressed one
-         * @param {String} b64gzippedJSON The Base64 string of the compressed JSON data
-         * @returns {Object} The original object use at compression time
+         * @type {function}
+         * @description Recreates an object from a previously compressed input
+         * @param {string} b64gzippedJSON The Base64 string of the gzipped JSON data
+         * @param {boolean} [returnJSON = false] Should the returned value be a JSON string or a fully parsed object
+         * @returns {(Object|string)} The original input use at compression time
          */
-        api.decompress = (b64gzippedJSON) => {
+        api.decompress = (b64gzippedJSON, returnJSON = false) => {
             let gzippedJSON = window.atob(b64gzippedJSON);
             let json = String.fromCharCode.apply(String, pako.ungzip(gzippedJSON, {
                 level: 9
@@ -85,7 +91,7 @@ import pako from 'pako';
                 let key = objKeys[index][1];
                 objStr = objStr.replace(new RegExp('(?:"' + _escapeRegExp(key) + '"):', 'g'), '"' + oldKey + '":');
             }
-            return JSON.parse(objStr);
+            return returnJSON ? objStr : JSON.parse(objStr);
         }
 
         //private
