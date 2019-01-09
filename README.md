@@ -1,5 +1,5 @@
 # GZON
-_version 0.9.1_
+_version 0.9.5_
   
 [![Build Status](https://travis-ci.com/JimZeeKing/GZON.svg?branch=master)](https://travis-ci.com/JimZeeKing/GZON)
 
@@ -22,5 +22,4 @@ See the [index.html](https://github.com/JimZeeKing/GZON/blob/master/index.html) 
 Should you want to update the library, just `npm install` and `npm run bundle` or `npm run bundle-minified` to build the library
 
 # TODO
-- Allow input to be a JSON string or an object
 - Allow keys to be protected from replacement
