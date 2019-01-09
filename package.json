@@ -11,6 +11,7 @@
     "bundle": "browserify ./src/main.js -o ./dist/gzon.js -t [ babelify --presets [ @babel/preset-env] ]",
     "bundle-minified": "browserify -g [ uglifyify ] ./src/gzon.js -o ./dist/gzon.min.js -t [ babelify --presets [ @babel/preset-env] ]",
     "deploy": "npm run bundle && npm run bundle-minified",
+    "doc": "node_modules/.bin/jsdoc ./src/gzon.js -d ./docs",
     "test": "karma start test/karma.conf.js"
   },
   "author": "JimZeeKing",
