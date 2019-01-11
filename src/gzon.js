@@ -24,7 +24,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import pako from 'pako';
+//import pako from 'pako';
 
 (function () {
     'use strict';
@@ -34,7 +34,7 @@ import pako from 'pako';
      * @alias GZON
      * @description A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC
      * @author JimZeeKing
-     * @version 0.9.8
+     * @version 0.9.9
      * @todo Allow user to specify single key not to be touched or used during compression
      */
     function GZON() {
@@ -47,13 +47,18 @@ import pako from 'pako';
          * @type {function}
          * @description Compress data with GZIP to a final Base64 string
          * @param {(Object|string)} obj Input data to compress
+         * @param {boolean} [safe = false] Should GZON protect existing keys from beign replaced if they can collide with replacement ones? Use this if you have keys to protect from replacement.
          * @returns {string} The final Base64 string of the JSON data
          */
-        api.compress = (obj) => {
+        api.compress = (obj, safe = false) => {
             if (typeof obj === "string") {
                 obj = JSON.parse(obj);
             }
-            _protectKeys(obj);
+
+            if (safe) {
+                _protectKeys(obj);
+            }
+
             _grabKeys(obj);
             obj.GZONKeys = _replacedKeys;
             let objStr = JSON.stringify(obj);
@@ -125,18 +130,30 @@ import pako from 'pako';
          * @type {Array}
          */
         let _replacedKeys = [];
+        /**
+         * @private
+         * @type {Array}
+         */
         let _allKeys = [];
-
+        /**
+         * @private
+         * @type {Number}
+         */
         let _keysTested = 0;
 
 
-
+        /**
+         * @private
+         * @type {Function}
+         * @description Grab and store all keys to be replaced in the input object, allowing next step to protect keys from replacement if they collides with replacement ones. This call will be recursive if needed too.
+         * @param {Object} object The input object to compress
+         * @returns {undefined} 
+         */
         let _protectKeys = (object) => {
-
             let entries = Object.entries(object);
             _allKeys = _allKeys.concat(Object.keys(object));
             _allKeys = _uniq(_allKeys);
-            console.log("GRAB", _allKeys)
+            console.log("PROTECT");
             for (let index = 0; index < entries.length; index++) {
                 let key = entries[index][0];
                 let value = entries[index][1];
@@ -148,48 +165,47 @@ import pako from 'pako';
                     } else if (Array.isArray(value)) {
                         for (let j = 0; j < value.length; j++) {
                             _protectKeys(value[j]);
-
                         }
                     };
-
-
                 }
             }
+            //reset keys for next step
             _keys = [];
-        }
-
-        /**
-         * 
-         * @param {*} a 
-         */
-        let _uniq = (a) => {
-            let unique_array = a.filter(function (elem, index, self) {
-                return index == self.indexOf(elem);
-            });
-            return unique_array
         }
 
         /**
          * @private
          * @type {Function}
-         * @description Grab and store all keys to be replaced in the input object. This call will be recusrsive if needed too.
+         * @description Makes sure there is only unique values in the array
+         * @param {Array} array The input array to check
+         * @returns {Array} The array free of duplicate values
+         */
+        let _uniq = (array) => {
+            let ua = array.filter(function (elem, index, self) {
+                return index == self.indexOf(elem);
+            });
+            return ua
+        }
+
+        /**
+         * @private
+         * @type {Function}
+         * @description Grab and store all keys to be replaced in the input object. This also choose wich replacement key to use. This call will be recursive if needed too.
          * @param {Object} object The input object to compress
          * @returns {undefined} 
          */
-
-
         let _grabKeys = (object) => {
             let entries = Object.entries(object);
-
-
+            console.log(_allKeys);
             for (let index = 0; index < entries.length; index++) {
                 let key = entries[index][0];
                 let value = entries[index][1];
                 if (_keys.indexOf(key) == -1) {
                     _keys.push(key);
                     let rkey = _addReplacementKeys(Math.ceil(((_keysTested == 0) ? 1 : _keysTested) / _replacementsKeys.length));
+                    console.log(key, rkey, _allKeys.indexOf(rkey), _allKeys);
                     while (_allKeys.indexOf(rkey) != -1) {
-
+                        console.log("FOUJND", rkey);
                         rkey = _addReplacementKeys(Math.ceil(((_keysTested == 0) ? 1 : _keysTested) / _replacementsKeys.length));
                     }
                     let tmp = [key, rkey];
@@ -203,11 +219,8 @@ import pako from 'pako';
                     } else if (Array.isArray(value)) {
                         for (let j = 0; j < value.length; j++) {
                             _grabKeys(value[j]);
-
                         }
                     };
-
-
                 }
             }
         };

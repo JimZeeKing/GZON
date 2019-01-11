@@ -36,7 +36,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
    * @alias GZON
    * @description A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC
    * @author JimZeeKing
-   * @version 0.9.5
+   * @version 0.9.9
    * @todo Allow user to specify single key not to be touched or used during compression
    */
 
@@ -48,13 +48,19 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
      * @type {function}
      * @description Compress data with GZIP to a final Base64 string
      * @param {(Object|string)} obj Input data to compress
+     * @param {boolean} [safe = false] Should GZON protect existing keys from beign replaced if they can collide with replacement ones? Use this if you have keys to protect from replacement.
      * @returns {string} The final Base64 string of the JSON data
      */
 
     api.compress = function (obj) {
+      var safe = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
       if (typeof obj === "string") {
         obj = JSON.parse(obj);
-        console.log("string");
+      }
+
+      if (safe) {
+        _protectKeys(obj);
       }
 
       _grabKeys(obj);
@@ -89,6 +95,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       var json = String.fromCharCode.apply(String, pako.ungzip(gzippedJSON, {
         level: 9
       }));
+      console.log(json);
       var obj = JSON.parse(json);
       var objKeys = obj.GZONKeys;
       delete obj.GZONKeys;
@@ -121,7 +128,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
      * @type {Array}
      */
 
-    var _objs = [];
+    var _alreadyUsedKeys = [];
     /**
      * @private
      * @type {String}
@@ -136,14 +143,29 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     var _replacedKeys = [];
     /**
      * @private
+     * @type {Array}
+     */
+
+    var _allKeys = [];
+    /**
+     * @private
+     * @type {Number}
+     */
+
+    var _keysTested = 0;
+    /**
+     * @private
      * @type {Function}
-     * @description Grab and store all keys to be replaced in the input object. This call will be recusrsive if needed too.
+     * @description Grab and store all keys to be replaced in the input object, allowing next step to protect keys from replacement if they collides with replacement ones. This call will be recursive if needed too.
      * @param {Object} object The input object to compress
      * @returns {undefined} 
      */
 
-    var _grabKeys = function _grabKeys(object) {
+    var _protectKeys = function _protectKeys(object) {
       var entries = Object.entries(object);
+      _allKeys = _allKeys.concat(Object.keys(object));
+      _allKeys = _uniq(_allKeys);
+      console.log("PROTECT");
 
       for (var index = 0; index < entries.length; index++) {
         var key = entries[index][0];
@@ -152,9 +174,71 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         if (_keys.indexOf(key) == -1) {
           _keys.push(key);
 
-          var tmp = [key, _addReplacementKeys(Math.ceil(_keys.length / _replacementsKeys.length))];
+          if (_typeof(value) == "object" && !Array.isArray(value)) {
+            //we have an object
+            _protectKeys(value);
+          } else if (Array.isArray(value)) {
+            for (var j = 0; j < value.length; j++) {
+              _protectKeys(value[j]);
+            }
+          }
 
-          _replacedKeys.push(tmp);
+          ;
+        }
+      } //reset keys for next step
+
+
+      _keys = [];
+    };
+    /**
+     * @private
+     * @type {Function}
+     * @description Makes sure there is only unique values in the array
+     * @param {Array} array The input array to check
+     * @returns {Array} The array free of duplicate values
+     */
+
+
+    var _uniq = function _uniq(array) {
+      var ua = array.filter(function (elem, index, self) {
+        return index == self.indexOf(elem);
+      });
+      return ua;
+    };
+    /**
+     * @private
+     * @type {Function}
+     * @description Grab and store all keys to be replaced in the input object. This also choose wich replacement key to use. This call will be recursive if needed too.
+     * @param {Object} object The input object to compress
+     * @returns {undefined} 
+     */
+
+
+    var _grabKeys = function _grabKeys(object) {
+      var entries = Object.entries(object);
+      console.log(_allKeys);
+
+      for (var index = 0; index < entries.length; index++) {
+        var key = entries[index][0];
+        var value = entries[index][1];
+
+        if (_keys.indexOf(key) == -1) {
+          _keys.push(key);
+
+          var rkey = _addReplacementKeys(Math.ceil((_keysTested == 0 ? 1 : _keysTested) / _replacementsKeys.length));
+
+          console.log(key, rkey, _allKeys.indexOf(rkey), _allKeys);
+
+          while (_allKeys.indexOf(rkey) != -1) {
+            console.log("FOUJND", rkey);
+            rkey = _addReplacementKeys(Math.ceil((_keysTested == 0 ? 1 : _keysTested) / _replacementsKeys.length));
+          }
+
+          var tmp = [key, rkey];
+
+          if (_replacementsKeys.indexOf(key) == -1) {
+            _replacedKeys.push(tmp);
+          }
 
           if (_typeof(value) == "object" && !Array.isArray(value)) {
             //we have an object
@@ -193,13 +277,14 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
     var _addReplacementKeys = function _addReplacementKeys() {
       var totalToAdd = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      var _keys = "";
+      var keys = "";
 
       for (var i = 0; i < totalToAdd; i++) {
-        _keys += _replacementsKeys.charAt(_replacedKeys.length % _replacementsKeys.length);
+        keys += _replacementsKeys.charAt(_keysTested % _replacementsKeys.length);
       }
 
-      return _keys;
+      _keysTested++;
+      return keys;
     }; //only public api will be exposed
 
 
