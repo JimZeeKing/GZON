@@ -34,7 +34,7 @@ import pako from 'pako';
      * @alias GZON
      * @description A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC
      * @author JimZeeKing
-     * @version 0.9.5
+     * @version 0.9.8
      * @todo Allow user to specify single key not to be touched or used during compression
      */
     function GZON() {
@@ -52,9 +52,8 @@ import pako from 'pako';
         api.compress = (obj) => {
             if (typeof obj === "string") {
                 obj = JSON.parse(obj);
-                console.log("string");
             }
-
+            _protectKeys(obj);
             _grabKeys(obj);
             obj.GZONKeys = _replacedKeys;
             let objStr = JSON.stringify(obj);
@@ -82,6 +81,7 @@ import pako from 'pako';
             let json = String.fromCharCode.apply(String, pako.ungzip(gzippedJSON, {
                 level: 9
             }));
+            console.log(json);
             let obj = JSON.parse(json);
             let objKeys = obj.GZONKeys;
             delete obj.GZONKeys;
@@ -112,7 +112,7 @@ import pako from 'pako';
          * @private
          * @type {Array}
          */
-        let _objs = [];
+        let _alreadyUsedKeys = [];
 
         /**
          * @private
@@ -125,6 +125,49 @@ import pako from 'pako';
          * @type {Array}
          */
         let _replacedKeys = [];
+        let _allKeys = [];
+
+        let _keysTested = 0;
+
+
+
+        let _protectKeys = (object) => {
+
+            let entries = Object.entries(object);
+            _allKeys = _allKeys.concat(Object.keys(object));
+            _allKeys = _uniq(_allKeys);
+            console.log("GRAB", _allKeys)
+            for (let index = 0; index < entries.length; index++) {
+                let key = entries[index][0];
+                let value = entries[index][1];
+                if (_keys.indexOf(key) == -1) {
+                    _keys.push(key);
+                    if (typeof value == "object" && !Array.isArray(value)) {
+                        //we have an object
+                        _protectKeys(value);
+                    } else if (Array.isArray(value)) {
+                        for (let j = 0; j < value.length; j++) {
+                            _protectKeys(value[j]);
+
+                        }
+                    };
+
+
+                }
+            }
+            _keys = [];
+        }
+
+        /**
+         * 
+         * @param {*} a 
+         */
+        let _uniq = (a) => {
+            let unique_array = a.filter(function (elem, index, self) {
+                return index == self.indexOf(elem);
+            });
+            return unique_array
+        }
 
         /**
          * @private
@@ -133,23 +176,38 @@ import pako from 'pako';
          * @param {Object} object The input object to compress
          * @returns {undefined} 
          */
+
+
         let _grabKeys = (object) => {
             let entries = Object.entries(object);
+
+
             for (let index = 0; index < entries.length; index++) {
                 let key = entries[index][0];
                 let value = entries[index][1];
                 if (_keys.indexOf(key) == -1) {
                     _keys.push(key);
-                    let tmp = [key, _addReplacementKeys(Math.ceil(_keys.length / _replacementsKeys.length))];
-                    _replacedKeys.push(tmp);
+                    let rkey = _addReplacementKeys(Math.ceil(((_keysTested == 0) ? 1 : _keysTested) / _replacementsKeys.length));
+                    while (_allKeys.indexOf(rkey) != -1) {
+
+                        rkey = _addReplacementKeys(Math.ceil(((_keysTested == 0) ? 1 : _keysTested) / _replacementsKeys.length));
+                    }
+                    let tmp = [key, rkey];
+                    if (_replacementsKeys.indexOf(key) == -1) {
+                        _replacedKeys.push(tmp);
+                    }
+
                     if (typeof value == "object" && !Array.isArray(value)) {
                         //we have an object
                         _grabKeys(value);
                     } else if (Array.isArray(value)) {
                         for (let j = 0; j < value.length; j++) {
                             _grabKeys(value[j]);
+
                         }
                     };
+
+
                 }
             }
         };
@@ -174,11 +232,12 @@ import pako from 'pako';
          * @returns {String} The replacement key
          */
         let _addReplacementKeys = (totalToAdd = 1) => {
-            let _keys = "";
+            let keys = "";
             for (let i = 0; i < totalToAdd; i++) {
-                _keys += _replacementsKeys.charAt(_replacedKeys.length % _replacementsKeys.length);
+                keys += _replacementsKeys.charAt(_keysTested % _replacementsKeys.length);
             }
-            return _keys;
+            _keysTested++;
+            return keys;
         }
 
         //only public api will be exposed
