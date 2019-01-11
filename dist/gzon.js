@@ -36,8 +36,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
    * @alias GZON
    * @description A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC
    * @author JimZeeKing
-   * @version 0.9.9
-   * @todo Allow user to specify single key not to be touched or used during compression
+   * @version 1.0.0
    */
 
   function GZON() {
@@ -54,6 +53,10 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
     api.compress = function (obj) {
       var safe = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      _allKeys = [];
+      _keys = [];
+      _replacedKeys = [];
+      _keysTested = 0;
 
       if (typeof obj === "string") {
         obj = JSON.parse(obj);
@@ -95,7 +98,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       var json = String.fromCharCode.apply(String, pako.ungzip(gzippedJSON, {
         level: 9
       }));
-      console.log(json);
       var obj = JSON.parse(json);
       var objKeys = obj.GZONKeys;
       delete obj.GZONKeys;
@@ -164,8 +166,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     var _protectKeys = function _protectKeys(object) {
       var entries = Object.entries(object);
       _allKeys = _allKeys.concat(Object.keys(object));
-      _allKeys = _uniq(_allKeys);
-      console.log("PROTECT");
+      _allKeys = _distinct(_allKeys);
 
       for (var index = 0; index < entries.length; index++) {
         var key = entries[index][0];
@@ -195,11 +196,11 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
      * @type {Function}
      * @description Makes sure there is only unique values in the array
      * @param {Array} array The input array to check
-     * @returns {Array} The array free of duplicate values
+     * @returns {Array} The array freed of duplicate values
      */
 
 
-    var _uniq = function _uniq(array) {
+    var _distinct = function _distinct(array) {
       var ua = array.filter(function (elem, index, self) {
         return index == self.indexOf(elem);
       });
@@ -215,8 +216,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
 
     var _grabKeys = function _grabKeys(object) {
-      var entries = Object.entries(object);
-      console.log(_allKeys);
+      var entries = Object.entries(object); //console.log(_allKeys);
 
       for (var index = 0; index < entries.length; index++) {
         var key = entries[index][0];
@@ -225,12 +225,11 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         if (_keys.indexOf(key) == -1) {
           _keys.push(key);
 
-          var rkey = _addReplacementKeys(Math.ceil((_keysTested == 0 ? 1 : _keysTested) / _replacementsKeys.length));
+          var rkey = _addReplacementKeys(Math.ceil((_keysTested == 0 ? 1 : _keysTested) / _replacementsKeys.length)); //  console.log(key, rkey, _allKeys.indexOf(rkey), _allKeys);
 
-          console.log(key, rkey, _allKeys.indexOf(rkey), _allKeys);
 
           while (_allKeys.indexOf(rkey) != -1) {
-            console.log("FOUJND", rkey);
+            // console.log("FOUJND", rkey);
             rkey = _addReplacementKeys(Math.ceil((_keysTested == 0 ? 1 : _keysTested) / _replacementsKeys.length));
           }
 

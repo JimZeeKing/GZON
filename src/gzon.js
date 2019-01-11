@@ -24,7 +24,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-//import pako from 'pako';
+import pako from 'pako';
 
 (function () {
     'use strict';
@@ -34,8 +34,7 @@
      * @alias GZON
      * @description A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. Inspired by https://github.com/tcorral/JSONC
      * @author JimZeeKing
-     * @version 0.9.9
-     * @todo Allow user to specify single key not to be touched or used during compression
+     * @version 1.0.0
      */
     function GZON() {
 
@@ -51,6 +50,11 @@
          * @returns {string} The final Base64 string of the JSON data
          */
         api.compress = (obj, safe = false) => {
+            _allKeys = [];
+            _keys = [];
+            _replacedKeys = [];
+            _keysTested = 0;
+
             if (typeof obj === "string") {
                 obj = JSON.parse(obj);
             }
@@ -60,14 +64,17 @@
             }
 
             _grabKeys(obj);
+
             obj.GZONKeys = _replacedKeys;
             let objStr = JSON.stringify(obj);
             delete obj.GZONKeys;
+
             for (let index = 0; index < _replacedKeys.length; index++) {
                 let key = _replacedKeys[index][0];
                 let newKey = _replacedKeys[index][1];
                 objStr = objStr.replace(new RegExp('(?:"' + _escapeRegExp(key) + '"):', 'g'), '"' + newKey + '":');
             }
+
             return window.btoa(String.fromCharCode.apply(String, pako.gzip(objStr, {
                 level: 9
             })));
@@ -83,19 +90,23 @@
          */
         api.decompress = (b64gzippedJSON, returnJSONString = false) => {
             let gzippedJSON = window.atob(b64gzippedJSON);
+
             let json = String.fromCharCode.apply(String, pako.ungzip(gzippedJSON, {
                 level: 9
             }));
-            console.log(json);
+
             let obj = JSON.parse(json);
             let objKeys = obj.GZONKeys;
             delete obj.GZONKeys;
+
             let objStr = JSON.stringify(obj);
             for (let index = 0; index < objKeys.length; index++) {
                 let oldKey = objKeys[index][0];
+
                 let key = objKeys[index][1];
                 objStr = objStr.replace(new RegExp('(?:"' + _escapeRegExp(key) + '"):', 'g'), '"' + oldKey + '":');
             }
+
             return returnJSONString ? objStr : JSON.parse(objStr);
         }
 
@@ -152,8 +163,7 @@
         let _protectKeys = (object) => {
             let entries = Object.entries(object);
             _allKeys = _allKeys.concat(Object.keys(object));
-            _allKeys = _uniq(_allKeys);
-            console.log("PROTECT");
+            _allKeys = _distinct(_allKeys);
             for (let index = 0; index < entries.length; index++) {
                 let key = entries[index][0];
                 let value = entries[index][1];
@@ -178,9 +188,9 @@
          * @type {Function}
          * @description Makes sure there is only unique values in the array
          * @param {Array} array The input array to check
-         * @returns {Array} The array free of duplicate values
+         * @returns {Array} The array freed of duplicate values
          */
-        let _uniq = (array) => {
+        let _distinct = (array) => {
             let ua = array.filter(function (elem, index, self) {
                 return index == self.indexOf(elem);
             });
@@ -196,16 +206,16 @@
          */
         let _grabKeys = (object) => {
             let entries = Object.entries(object);
-            console.log(_allKeys);
+            //console.log(_allKeys);
             for (let index = 0; index < entries.length; index++) {
                 let key = entries[index][0];
                 let value = entries[index][1];
                 if (_keys.indexOf(key) == -1) {
                     _keys.push(key);
                     let rkey = _addReplacementKeys(Math.ceil(((_keysTested == 0) ? 1 : _keysTested) / _replacementsKeys.length));
-                    console.log(key, rkey, _allKeys.indexOf(rkey), _allKeys);
+                    //  console.log(key, rkey, _allKeys.indexOf(rkey), _allKeys);
                     while (_allKeys.indexOf(rkey) != -1) {
-                        console.log("FOUJND", rkey);
+                        // console.log("FOUJND", rkey);
                         rkey = _addReplacementKeys(Math.ceil(((_keysTested == 0) ? 1 : _keysTested) / _replacementsKeys.length));
                     }
                     let tmp = [key, rkey];
@@ -255,6 +265,7 @@
 
         //only public api will be exposed
         return api;
+
 
     }
     module.exports = GZON();
