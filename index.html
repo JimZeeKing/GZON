@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Obred</title>
-    <script src="dist/gzon.js"></script>
+    <title>GZON</title>
+    <script src="dist/gzon.standalone.min.js"></script>
 </head>
 
 <body>
@@ -1733,11 +1733,11 @@
             }
         };
 
-        console.log(JSON.stringify(o));
-        var t = GZON.compress(o);
-        console.log(t);
-        var e = GZON.decompress(t);
-        console.log(e);
+        console.log(o);
+        var c = GZON.compress(o);
+        console.log(c);
+        var d = GZON.decompress(c);
+        console.log(d);
     </script>
 </body>
 
