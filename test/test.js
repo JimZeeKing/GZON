@@ -1739,7 +1739,7 @@ var inputBig = {
 };
 
 var inputJSON = JSON.stringify(inputBig);
-
+var inputJSONHuge = JSON.stringify(readJSON('test/data/MOCK_DATA.json'));
 var protectedKeys = {
 
     perso: true,
@@ -1757,6 +1757,7 @@ describe('Compression', function () {
     var compressed = GZON.compress(inputSmall);
     var compressedBig = GZON.compress(inputBig);
     var compressedJSON = GZON.compress(inputJSON);
+    var compressedJSONHuge = GZON.compress(inputJSONHuge);
     var compressedProtected = GZON.compress(protectedKeys, true);
 
     it('should return a string', function () {
@@ -1769,6 +1770,10 @@ describe('Compression', function () {
 
     it('should return a string', function () {
         expect(compressedJSON).toEqual(jasmine.any(String));
+    });
+
+    it('should return a string', function () {
+        expect(compressedJSONHuge).toEqual(jasmine.any(String));
     });
 
     it('should return a string', function () {
@@ -1789,6 +1794,10 @@ describe('Compression', function () {
         var protectedCompressedBytes = (compressedProtected.length / 1024).toFixed(2);
         console.log("Efficiency small object : " + (protectedBytes / protectedCompressedBytes).toFixed(1) + "X " + ((Number(protectedBytes) > Number(protectedCompressedBytes)) ? "reduction" : "increase") + " " + (protectedBytes + " --> " + protectedCompressedBytes));
 
+        var hugeBytes = (inputJSONHuge.length / 1024).toFixed(2);
+        var hugeCompressedBytes = (compressedJSONHuge.length / 1024).toFixed(2);
+        console.log("Efficiency big object : " + (hugeBytes / hugeCompressedBytes).toFixed(1) + "X " + ((Number(hugeBytes) > Number(hugeCompressedBytes)) ? "reduction" : "increase") + " " + (hugeBytes + " --> " + hugeCompressedBytes));
+        expect(compressedJSONHuge.length).toBeLessThan(inputJSONHuge.length);
     });
 });
 
@@ -1796,6 +1805,7 @@ describe('Decompression', function () {
     var compressed = GZON.compress(inputSmall);
     var compressedBig = GZON.compress(inputBig);
     var compressedJSON = GZON.compress(inputJSON);
+    var compressedJSONHuge = GZON.compress(inputJSONHuge);
     var compressedProtected = GZON.compress(protectedKeys, true);
 
     it('should restore object original identity : compressed', function () {
@@ -1810,11 +1820,19 @@ describe('Decompression', function () {
         expect(GZON.decompress(compressedJSON)).toEqual(JSON.parse(inputJSON));
     });
 
+    it('should restore object original identity : compressedJSONHuge', function () {
+        expect(GZON.decompress(compressedJSONHuge)).toEqual(JSON.parse(inputJSONHuge));
+    });
+
     it('should restore object original identity : compressedProtected', function () {
         expect(GZON.decompress(compressedProtected)).toEqual(protectedKeys);
     });
 
     it('should return a JSON string of uncompressed data', function () {
         expect(GZON.decompress(compressedJSON, true)).toEqual(inputJSON);
+    });
+
+    it('should return a JSON string of uncompressed data', function () {
+        expect(GZON.decompress(compressedJSONHuge, true)).toEqual(inputJSONHuge);
     });
 });

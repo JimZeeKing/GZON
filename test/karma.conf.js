@@ -15,8 +15,17 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'dist/gzon.standalone.min.js',
-            'test/test.js'
+            'dist/gzon.standalone.js',
+            "node_modules/karma-read-json/karma-read-json.js",
+            'test/test.js',
+
+            // JSON fixture
+            {
+                pattern: 'test/data/*.json',
+                watched: true,
+                served: true,
+                included: false
+            }
         ],
 
 

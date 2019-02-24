@@ -213,9 +213,7 @@ import pako from 'pako';
                 if (_keys.indexOf(key) == -1) {
                     _keys.push(key);
                     let rkey = _addReplacementKeys(Math.ceil(((_keysTested == 0) ? 1 : _keysTested) / _replacementsKeys.length));
-                    //  console.log(key, rkey, _allKeys.indexOf(rkey), _allKeys);
                     while (_allKeys.indexOf(rkey) != -1) {
-                        // console.log("FOUJND", rkey);
                         rkey = _addReplacementKeys(Math.ceil(((_keysTested == 0) ? 1 : _keysTested) / _replacementsKeys.length));
                     }
                     let tmp = [key, rkey];
@@ -232,6 +230,7 @@ import pako from 'pako';
                         }
                     };
                 }
+
             }
         };
 

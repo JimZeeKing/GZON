@@ -10,7 +10,9 @@
   "scripts": {
     "b": "browserify ./src/main.js -o ./dist/gzon.js -t [ babelify --presets [ @babel/preset-env] ]",
     "bm": "browserify -g [ uglifyify ] ./src/main.js -o ./dist/gzon.min.js -t [ babelify --presets [ @babel/preset-env] ]",
+    "bs": "browserify ./src/main.js -o ./dist/gzon.standalone.js -t [ babelify --presets [ @babel/preset-env] ]",
     "bms": "browserify -g [ uglifyify ] ./src/main.js -o ./dist/gzon.standalone.min.js -t [ babelify --presets [ @babel/preset-env] ]",
+    "bst": "npm run bs && karma start test/karma.conf.js",
     "bmst": "npm run bms && karma start test/karma.conf.js",
     "deploy": "npm run b && npm run bm && npm run doc",
     "doc": "node_modules/.bin/jsdoc -c jsdoc.json",
@@ -26,6 +28,7 @@
     "karma": "^3.1.4",
     "karma-chrome-launcher": "^2.2.0",
     "karma-jasmine": "^2.0.1",
+    "karma-read-json": "^1.1.0",
     "pako": "^1.0.7",
     "uglifyify": "^5.0.1"
   },

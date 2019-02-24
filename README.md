@@ -3,7 +3,7 @@ _version 1.0.0_
   
 [![Build Status](https://travis-ci.com/JimZeeKing/GZON.svg?branch=master)](https://travis-ci.com/JimZeeKing/GZON)
 
-A simple JavaScript lib to compress, decompress and optimize json data exchange with GZIP and Base64. This library try to reduce object size by replacing keys with smaller ones. Thus, an object with a lot of different keys that never repeat will be harder to compressed efficiently. **It could even increase the size of the result for small object**
+A simple JavaScript lib to compress, decompress and optimize javascript object and json data exchange with the help of GZIP and Base64. This library try to reduce object size by replacing keys with smaller ones. Thus, an object with a lot of different keys that never repeat will be harder to compressed efficiently. **It could even increase the size of the result for small object**. As for now, only object and json object can be used.
 
 
 # Inspiration
@@ -16,7 +16,12 @@ Just use one of the three files in the **dist** folder and you are good to go! `
 You can read throught this [huge documentation](https://jimzeeking.github.io/GZON/GZON.html) :)
 
 # Example
-See the [index.html](https://github.com/JimZeeKing/GZON/blob/master/index.html) file to test it live with a demo object.<br>With the demo there, the initial json data string is ~28kb and the compressed result is ~3kb. Those results can vary depending of the input object.
+See the [index.html](https://github.com/JimZeeKing/GZON/blob/master/index.html) file to test it live with a demo object.<br>With the demo there, the initial json data string is ~28kb and the compressed result is ~3kb. Those results can vary depending of the input object. <br>The test file also show some numbers : 
+
+'Efficiency small object : 0.7X increase 0.16k --> 0.22k'
+<br>'Efficiency big object : 8.1X reduction 24.26k --> 2.99k'
+<br>'Efficiency small object : 1.2X reduction 0.16k --> 0.13k'
+<br>'Efficiency big object : 3.1X reduction 130.90k --> 41.66k'
 
 # Build
 Should you want to update the library, just `npm install` and `npm run bundle` or `npm run bundle-minified` to build the library
